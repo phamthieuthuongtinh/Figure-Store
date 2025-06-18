@@ -1,0 +1,39 @@
+# ----------------------
+# DEPENDENCIES
+# ----------------------
+**/node_modules/
+.pnp/
+.pnp.js
+
+# ----------------------
+# BUILD / PRODUCTION
+# ----------------------
+**/build/
+**/dist/
+
+# ----------------------
+# ENVIRONMENT FILES
+# ----------------------
+**/.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ----------------------
+# TESTING
+# ----------------------
+/coverage
+
+# ----------------------
+# LOG FILES
+# ----------------------
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ----------------------
+# OS / EDITOR JUNK FILES
+# ----------------------
+.DS_Store
+Thumbs.db
