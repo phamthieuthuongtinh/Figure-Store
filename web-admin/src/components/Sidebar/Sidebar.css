@@ -1,0 +1,52 @@
+.sidebar {
+  width: 280px;
+  height: 100vh;
+  background-color: #f5f7fa; /* màu nền sáng nhẹ */
+  color: #333;
+  padding: 20px;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1); /* tạo chiều sâu */
+}
+
+.sidebar h3 {
+  color: #1890ff;
+  margin-bottom: 24px;
+}
+
+.menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu li {
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+.menu li a {
+  text-decoration: none;
+  color: #333;
+  display: block;
+}
+
+.menu li:hover {
+  background-color: #e6f4ff;
+}
+
+.menu li:hover a {
+  color: #1890ff;
+}
+
+.menu li.active {
+  background-color: #e6f4ff;
+  border-left: 4px solid #1890ff;
+  font-weight: bold;
+}
+
+.menu li.active a {
+  color: #1890ff;
+}
