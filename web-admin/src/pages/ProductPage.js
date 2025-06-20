@@ -1,20 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Image, Button, Space, message, Popconfirm } from 'antd';
-import axios from 'axios';
 import ProductFormModal from '../components/Product/ProductFormModal';
 import {
-  getProducts,
   deleteProduct,
   createProduct,
   updateProduct,
   getAllProducts,
 } from '../services/ProductServices';
+import { getAllCategories } from '../services/CategoryServices';
+import { getAllBrands } from '../services/BrandServices';
 import '../components/Product/Product.css';
 function ProductPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editProduct, setEditProduct] = useState(null);
   const [products, setProducts] = useState([]);
-
+  const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [categoryMap, setCategoryMap] = useState({});
+  const [brandMap, setBrandMap] = useState({});
   const fetchProducts = () => {
     getAllProducts()
       .then((res) => {
@@ -26,9 +29,34 @@ function ProductPage() {
       })
       .catch(() => message.error('Lỗi kết nối tới server'));
   };
+  const fetchCategories = () => {
+    getAllCategories().then((res) => {
+      if (res.data.code === 1) {
+        const arr = res.data.data;
+        setCategories(arr);
+        const map = {};
+        arr.forEach((c) => (map[c.categoryId] = c.categoryName));
+        setCategoryMap(map);
+      }
+    });
+  };
+
+  const fetchBrands = () => {
+    getAllBrands().then((res) => {
+      if (res.data.code === 1) {
+        const arr = res.data.data;
+        setBrands(arr);
+        const map = {};
+        arr.forEach((b) => (map[b.brandId] = b.brandName));
+        setBrandMap(map);
+      }
+    });
+  };
 
   useEffect(() => {
     fetchProducts();
+    fetchCategories();
+    fetchBrands();
   }, []);
 
   const handleDelete = (id) => {
@@ -68,6 +96,16 @@ function ProductPage() {
   const columns = [
     { title: 'ID', dataIndex: 'productId' },
     { title: 'Tên sản phẩm', dataIndex: 'productName' },
+    {
+      title: 'Loại',
+      dataIndex: 'categoryId',
+      render: (id) => categoryMap[id] || '—',
+    },
+    {
+      title: 'Thương hiệu',
+      dataIndex: 'brandId',
+      render: (id) => brandMap[id] || '—',
+    },
     { title: 'Giá', dataIndex: 'productPrice' },
     { title: 'Mô tả', dataIndex: 'description' },
     {
@@ -122,7 +160,10 @@ function ProductPage() {
         rowKey="productId"
         pagination={{ pageSize: 5 }}
       />
+
       <ProductFormModal
+        categories={categories}
+        brands={brands}
         open={modalOpen}
         onClose={() => {
           setModalOpen(false);

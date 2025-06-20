@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:5000/products';
+const BASE_URL = 'http://localhost:5000/api/products';
 
 export const getAllProducts = () => axios.get(BASE_URL);
 
