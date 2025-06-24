@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const brandController = require('../controllers/brand.controller');
-
+const { verifyToken, isAdmin } = require('../middlewares/auth.middleware');
 router.get('/', brandController.getAllBrands);
 router.get('/:id', brandController.getBrandById);
-router.post('/', brandController.createBrand);
-router.put('/:id', brandController.updateBrand);
-router.patch('/:id', brandController.updateBrand);
-router.delete('/:id', brandController.deleteBrand);
+router.post('/', verifyToken, isAdmin, brandController.createBrand);
+router.put('/:id', verifyToken, isAdmin, brandController.updateBrand);
+router.patch('/:id', verifyToken, isAdmin, brandController.updateBrand);
+router.delete('/:id', verifyToken, isAdmin, brandController.deleteBrand);
 module.exports = router;
