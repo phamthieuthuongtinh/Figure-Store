@@ -8,4 +8,5 @@ router.use('/api/brands', require('./brand.routes'));
 router.use('/api/orders', require('./order.routes'));
 router.use('/api/orderdetails', require('./orderdetail.routes'));
 router.use('/api/coupons', require('./coupon.routes'));
+router.use('/api/users', require('./user.routes'));
 module.exports = router;

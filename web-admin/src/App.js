@@ -6,6 +6,9 @@ import CategoryPage from './pages/CategoryPage';
 import BrandPage from './pages/BrandPage';
 import LoginPage from './pages/LoginPage';
 import RequireAuth from './components/Auth/RequireAuth';
+import OrderPage from './pages/OrderPage';
+import OrderDetailPage from './pages/OrderDetailPage';
+import CouponPage from './pages/CouponPage';
 function App() {
   return (
     <Router>
@@ -26,6 +29,9 @@ function App() {
           <Route path="products" element={<ProductPage />} />
           <Route path="categories" element={<CategoryPage />} />
           <Route path="brands" element={<BrandPage />} />
+          <Route path="orders" element={<OrderPage />} />
+          <Route path="orderdetails/:id" element={<OrderDetailPage />} />
+          <Route path="coupons" element={<CouponPage />} />
         </Route>
       </Routes>
     </Router>

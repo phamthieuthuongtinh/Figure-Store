@@ -33,6 +33,12 @@ function Sidebar() {
         <li className={location.pathname === '/brands' ? 'active' : ''}>
           <Link to="/brands">Quản lý thương hiệu</Link>
         </li>
+        <li className={location.pathname === '/orders' ? 'active' : ''}>
+          <Link to="/orders">Quản lý đơn hàng</Link>
+        </li>
+        <li className={location.pathname === '/coupons' ? 'active' : ''}>
+          <Link to="/coupons">Quản lý Coupon</Link>
+        </li>
       </ul>
 
       <Divider />

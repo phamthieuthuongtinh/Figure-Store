@@ -62,7 +62,13 @@ function ProductFormModal({
         >
           <Input />
         </Form.Item>
-
+        <Form.Item
+          name="quantity"
+          label="Số lượng tồn kho"
+          rules={[{ required: true, message: 'Vui lòng nhập số lượng!' }]}
+        >
+          <InputNumber min={0} style={{ width: '100%' }} />
+        </Form.Item>
         {/* Giá + Loại + Thương hiệu: 1 dòng 3 cột */}
         <Row gutter={16}>
           <Col span={8}>

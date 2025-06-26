@@ -106,6 +106,7 @@ function ProductPage() {
       dataIndex: 'brandId',
       render: (id) => brandMap[id] || '—',
     },
+    { title: 'Tồn kho', dataIndex: 'quantity' },
     { title: 'Giá', dataIndex: 'productPrice' },
     { title: 'Mô tả', dataIndex: 'description' },
     {
@@ -158,7 +159,7 @@ function ProductPage() {
         dataSource={products}
         columns={columns}
         rowKey="productId"
-        pagination={{ pageSize: 5 }}
+        pagination={{ pageSize: 4 }}
       />
 
       <ProductFormModal
