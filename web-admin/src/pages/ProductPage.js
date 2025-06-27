@@ -10,6 +10,7 @@ import {
 import { getAllCategories } from '../services/CategoryServices';
 import { getAllBrands } from '../services/BrandServices';
 import '../components/Product/Product.css';
+import ProductImageModal from '../components/Product/ProductImageModal';
 function ProductPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editProduct, setEditProduct] = useState(null);
@@ -18,6 +19,8 @@ function ProductPage() {
   const [brands, setBrands] = useState([]);
   const [categoryMap, setCategoryMap] = useState({});
   const [brandMap, setBrandMap] = useState({});
+  const [imageModalOpen, setImageModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const fetchProducts = () => {
     getAllProducts()
       .then((res) => {
@@ -120,6 +123,14 @@ function ProductPage() {
         <Space>
           <Button
             onClick={() => {
+              setSelectedProduct(record);
+              setImageModalOpen(true);
+            }}
+          >
+            Thêm ảnh
+          </Button>
+          <Button
+            onClick={() => {
               setEditProduct(record); // record là dòng đang được sửa
               setModalOpen(true);
             }}
@@ -173,6 +184,11 @@ function ProductPage() {
         onSubmit={handleSubmit}
         initialValues={editProduct}
         isEdit={!!editProduct}
+      />
+      <ProductImageModal
+        open={imageModalOpen}
+        product={selectedProduct}
+        onClose={() => setImageModalOpen(false)}
       />
     </div>
   );

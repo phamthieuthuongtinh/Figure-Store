@@ -24,6 +24,9 @@ function Sidebar() {
       </div>
 
       <ul className="menu">
+        <li className={location.pathname === '/users' ? 'active' : ''}>
+          <Link to="/users">Quản lý người dùng</Link>
+        </li>
         <li className={location.pathname === '/products' ? 'active' : ''}>
           <Link to="/products">Quản lý sản phẩm</Link>
         </li>

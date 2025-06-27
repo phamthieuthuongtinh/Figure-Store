@@ -9,6 +9,7 @@ import RequireAuth from './components/Auth/RequireAuth';
 import OrderPage from './pages/OrderPage';
 import OrderDetailPage from './pages/OrderDetailPage';
 import CouponPage from './pages/CouponPage';
+import UserPage from './pages/UserPage';
 function App() {
   return (
     <Router>
@@ -26,6 +27,7 @@ function App() {
           }
         >
           <Route index element={<h2>Chào mừng đến trang admin!</h2>} />
+          <Route path="users" element={<UserPage />} />
           <Route path="products" element={<ProductPage />} />
           <Route path="categories" element={<CategoryPage />} />
           <Route path="brands" element={<BrandPage />} />

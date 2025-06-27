@@ -17,7 +17,7 @@ const getOrderDetailById = async (id) => {
     );
   return (await result).recordset;
 };
-const createOrderDetail = async (data) => {
+const createOrderDetail = async ({ orderId, items }) => {
   const pool = await poolPromise;
   const transaction = new sql.Transaction(pool);
 
@@ -26,10 +26,37 @@ const createOrderDetail = async (data) => {
 
     const insertedItems = [];
 
-    for (const item of data.items) {
-      const request = new sql.Request(transaction);
-      const result = await request
-        .input('orderId', data.orderId)
+    for (const item of items) {
+      // 1. Kiểm tra tồn kho
+      const stock = await transaction
+        .request()
+        .input('productId', item.productId)
+        .query('SELECT quantity FROM Products WHERE productId = @productId');
+
+      const current = stock.recordset[0]?.quantity ?? 0;
+      if (current < item.quantity) {
+        // Không đủ hàng → huỷ đơn
+        await transaction
+          .request()
+          .input('orderId', orderId)
+          .query('DELETE FROM Orders WHERE orderId = @orderId');
+        throw new Error(`Sản phẩm ID ${item.productId} không đủ tồn kho`);
+      }
+
+      // 2. Trừ kho
+      await transaction
+        .request()
+        .input('productId', item.productId)
+        .input('qty', item.quantity).query(`
+          UPDATE Products
+          SET quantity = quantity - @qty
+          WHERE productId = @productId
+        `);
+
+      // 3. Thêm chi tiết
+      const detailRes = await transaction
+        .request()
+        .input('orderId', orderId)
         .input('productId', item.productId)
         .input('quantity', item.quantity)
         .input('priceAtTime', item.priceAtTime).query(`
@@ -37,7 +64,8 @@ const createOrderDetail = async (data) => {
           OUTPUT INSERTED.*
           VALUES (@orderId, @productId, @quantity, @priceAtTime)
         `);
-      insertedItems.push(result.recordset[0]);
+
+      insertedItems.push(detailRes.recordset[0]);
     }
 
     await transaction.commit();
