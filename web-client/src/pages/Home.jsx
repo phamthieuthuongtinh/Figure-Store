@@ -11,7 +11,7 @@ import NewsAndSocial from '../components/NewsAndSocial';
 
 function Home() {
   return (
-    <div className="font-sans">
+    <div className=" font-sans">
       <div className="max-w-full mx-auto px-4">
         <Banner />
         <FlashSale />

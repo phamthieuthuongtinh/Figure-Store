@@ -1,8 +1,8 @@
-// src/services/productService.js
-import axios from 'axios';
+import axiosInstance from './axiosInstance';
 
-const BASE_URL = 'http://localhost:5000/api/products'; // sửa nếu khác
+export const getAllProducts = () => axiosInstance.get('/products');
 
-export const getAllProducts = () => {
-  return axios.get(BASE_URL);
-};
+export const getAllSales = () => axiosInstance.get('/sales');
+
+export const getFlashSaleProducts = () =>
+  axiosInstance.get('/products/flash-sale');

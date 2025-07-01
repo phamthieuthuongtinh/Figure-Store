@@ -1,55 +1,55 @@
-// src/components/Banner.jsx
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchBanners } from '../slices/bannersSlice';
+
 import { Swiper, SwiperSlide } from 'swiper/react';
-import 'swiper/css';
 import { Autoplay } from 'swiper/modules';
-const banners = [
-  {
-    image: 'https://cdn.tgdd.vn/Files/2022/11/22/1489441/dochoi-4.jpg',
-    title: 'Thế giới đồ chơi chính hãng',
-    subtitle: 'Khám phá hàng trăm sản phẩm mới mỗi tuần',
-  },
-  {
-    image: 'https://cdn.tgdd.vn/Files/2021/12/10/1401346/lego-banner.jpg',
-    title: 'LEGO siêu giảm giá',
-    subtitle: 'Giảm đến 40% cho tất cả dòng LEGO',
-  },
-  {
-    image: 'https://cdn.tgdd.vn/Files/2020/07/17/1270575/mo-hinh-4.jpg',
-    title: 'Mô hình cực chất',
-    subtitle: 'Siêu phẩm cho người mê sưu tầm',
-  },
-];
+import 'swiper/css';
 
 function Banner() {
+  const dispatch = useDispatch();
+  const { items: banners, loading } = useSelector((state) => state.banners);
+
+  useEffect(() => {
+    dispatch(fetchBanners());
+  }, [dispatch]);
+
+  if (loading) return <p className="text-center py-8">Đang tải banner...</p>;
+
   return (
-    <Swiper
-      modules={[Autoplay]} // ← Bật module Autoplay
-      autoplay={{ delay: 3000, disableOnInteraction: false }}
-      loop={true}
-      slidesPerView={1}
-    >
-      {banners.map((item, idx) => (
-        <SwiperSlide key={idx}>
-          <div
-            className="h-[400px] bg-cover bg-center relative"
-            style={{ backgroundImage: `url(${item.image})` }}
-          >
-            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <div className="text-center text-white px-4">
-                <h1 className="text-4xl md:text-5xl font-bold mb-4">
-                  {item.title}
-                </h1>
-                <p className="text-lg md:text-xl mb-6">{item.subtitle}</p>
-                <button className="bg-yellow-400 hover:bg-yellow-500 text-black font-semibold px-6 py-2 rounded">
-                  Mua ngay
-                </button>
+    <div className="py-0 bg-white">
+      <div className="max-w-7xl mx-auto px-4">
+        <Swiper
+          modules={[Autoplay]}
+          autoplay={{ delay: 3000, disableOnInteraction: false }}
+          loop
+          slidesPerView={1}
+        >
+          {banners.map((b) => (
+            <SwiperSlide key={b.bannerId}>
+              <div
+                className="h-[500px] bg-cover bg-center relative"
+                style={{ backgroundImage: `url(${b.imageUrl})` }}
+              >
+                {/* text box ở góc phải‑dưới */}
+                {/* <div className="absolute right-8 bottom-8 text-right max-w-[50%]">
+              <h1 className="text-3xl md:text-5xl font-bold text-white drop-shadow-md">
+                {b.title}
+              </h1>
+
+              <a
+                href={b.link || '#'}
+                className="inline-block mt-4 bg-yellow-400 hover:bg-yellow-500 text-black font-semibold px-6 py-2 rounded shadow"
+              >
+                Xem&nbsp;ngay
+              </a>
+            </div> */}
               </div>
-            </div>
-          </div>
-        </SwiperSlide>
-      ))}
-    </Swiper>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
+    </div>
   );
 }
 

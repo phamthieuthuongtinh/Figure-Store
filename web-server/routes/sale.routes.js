@@ -1,0 +1,11 @@
+const express = require('express');
+const router = express.Router();
+const saleController = require('../controllers/sale.controller');
+const { verifyToken, isAdmin } = require('../middlewares/auth.middleware');
+router.get('/', saleController.getAllSales);
+router.get('/:id', saleController.getSaleById);
+router.post('/', verifyToken, isAdmin, saleController.createSale);
+router.put('/:id', verifyToken, isAdmin, saleController.updateSale);
+router.patch('/:id', verifyToken, isAdmin, saleController.updateSale);
+router.delete('/:id', verifyToken, isAdmin, saleController.deleteSale);
+module.exports = router;

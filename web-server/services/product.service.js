@@ -58,10 +58,32 @@ const deleteProduct = async (id) => {
     .input('productId', id)
     .query('UPDATE Products SET isDeleted = 1 WHERE productId = @productId');
 };
+const getFlashSaleProducts = async (req, res) => {
+  const pool = await poolPromise;
+  const result = await pool.request().query(`
+      SELECT
+        s.saleId,
+        s.productId,
+        p.productName,
+        p.imageUrl,
+        p.productPrice       AS price,
+        s.discountPercent,
+        (p.productPrice - p.productPrice * s.discountPercent / 100.0) AS discountedPrice,
+        s.startDate,
+        s.endDate
+      FROM  Sales    s
+      JOIN  Products p ON p.productId = s.productId
+      WHERE s.status = 1
+        AND GETDATE() BETWEEN s.startDate AND s.endDate
+      ORDER BY s.startDate DESC;
+    `);
+  return result.recordset;
+};
 module.exports = {
   getAllProducts,
   getProductById,
   createProduct,
   updateProduct,
   deleteProduct,
+  getFlashSaleProducts,
 };

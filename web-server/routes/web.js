@@ -10,5 +10,6 @@ router.use('/api/orders', require('./order.routes'));
 router.use('/api/orderdetails', require('./orderdetail.routes'));
 router.use('/api/coupons', require('./coupon.routes'));
 router.use('/api/users', require('./user.routes'));
-
+router.use('/api/sales', require('./sale.routes'));
+router.use('/api/banners', require('./banner.routes'));
 module.exports = router;

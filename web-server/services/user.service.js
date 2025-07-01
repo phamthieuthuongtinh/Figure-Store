@@ -14,9 +14,8 @@ const getUserById = async (id) => {
     .input('userId', id)
     .query('SELECT * FROM Users WHERE userId=@userId');
 
-  const user = result.recordset?.[0]; // dùng optional chaining
-
-  if (!user) return null; // hoặc throw lỗi nếu muốn
+  const user = result.recordset?.[0];
+  if (!user) return null;
 
   const { userPassword, ...safeUser } = user;
   return safeUser;

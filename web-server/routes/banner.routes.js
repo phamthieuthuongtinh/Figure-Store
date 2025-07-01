@@ -1,0 +1,11 @@
+const express = require('express');
+const router = express.Router();
+const bannerController = require('../controllers/banner.controller');
+const { verifyToken, isAdmin } = require('../middlewares/auth.middleware');
+router.get('/', bannerController.getAllBanners);
+router.get('/:id', bannerController.getBannerById);
+router.post('/', verifyToken, isAdmin, bannerController.createBanner);
+router.put('/:id', verifyToken, isAdmin, bannerController.updateBanner);
+router.patch('/:id', verifyToken, isAdmin, bannerController.updateBanner);
+router.delete('/:id', verifyToken, isAdmin, bannerController.deleteBanner);
+module.exports = router;

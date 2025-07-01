@@ -10,6 +10,8 @@ import OrderPage from './pages/OrderPage';
 import OrderDetailPage from './pages/OrderDetailPage';
 import CouponPage from './pages/CouponPage';
 import UserPage from './pages/UserPage';
+import SalePage from './pages/SalePage';
+import BannerPage from './pages/BannerPage';
 function App() {
   return (
     <Router>
@@ -34,6 +36,8 @@ function App() {
           <Route path="orders" element={<OrderPage />} />
           <Route path="orderdetails/:id" element={<OrderDetailPage />} />
           <Route path="coupons" element={<CouponPage />} />
+          <Route path="sales" element={<SalePage />} />
+          <Route path="banners" element={<BannerPage />} />
         </Route>
       </Routes>
     </Router>

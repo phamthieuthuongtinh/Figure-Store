@@ -24,6 +24,9 @@ function Sidebar() {
       </div>
 
       <ul className="menu">
+        <li className={location.pathname === '/' ? 'active' : ''}>
+          <Link to="/">Dashboard</Link>
+        </li>
         <li className={location.pathname === '/users' ? 'active' : ''}>
           <Link to="/users">Quản lý người dùng</Link>
         </li>
@@ -41,6 +44,12 @@ function Sidebar() {
         </li>
         <li className={location.pathname === '/coupons' ? 'active' : ''}>
           <Link to="/coupons">Quản lý Coupon</Link>
+        </li>
+        <li className={location.pathname === '/sales' ? 'active' : ''}>
+          <Link to="/sales">Quản lý giảm giá</Link>
+        </li>
+        <li className={location.pathname === '/banners' ? 'active' : ''}>
+          <Link to="/banners">Quản lý banner</Link>
         </li>
       </ul>
 
