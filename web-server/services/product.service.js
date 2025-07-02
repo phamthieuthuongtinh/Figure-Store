@@ -4,7 +4,9 @@ const getAllProducts = async () => {
   const pool = await poolPromise;
   const result = await pool
     .request()
-    .query('SELECT * FROM Products WHERE isDeleted = 0');
+    .query(
+      'SELECT * FROM Products WHERE isDeleted = 0 ORDER BY productId DESC'
+    );
   return result.recordset;
 };
 const getProductById = async (id) => {
@@ -17,6 +19,38 @@ const getProductById = async (id) => {
     );
   return result.recordset[0];
 };
+const getProductByCategoryId = async (id) => {
+  const pool = await poolPromise;
+  const result = await pool.request().input('categoryId', parseInt(id)).query(`
+      SELECT 
+        p.productId,
+        p.productName,
+        p.productPrice,
+        p.imageUrl,
+        s.discountPercent,
+        s.endDate,
+        CASE
+        WHEN s.discountPercent IS NOT NULL
+        AND s.endDate > GETDATE()
+          THEN CAST(p.productPrice * (1 - s.discountPercent / 100.0) AS INT)
+          ELSE NULL
+        END AS discountedPrice,
+        CASE 
+          WHEN s.discountPercent IS NOT NULL AND s.endDate > GETDATE() THEN 1
+          
+          ELSE 0
+        END AS isOnSale
+      FROM Products AS p
+      LEFT JOIN Sales AS s
+        ON p.productId = s.productId
+        AND s.endDate > GETDATE()
+      WHERE p.categoryId = @categoryId
+        AND p.isDeleted = 0
+      ORDER BY p.productId DESC;
+    `);
+  return result.recordset;
+};
+
 const createProduct = async (data) => {
   const pool = await poolPromise;
   // console.log(typeof data.productPrice, data.productPrice);
@@ -66,7 +100,7 @@ const getFlashSaleProducts = async (req, res) => {
         s.productId,
         p.productName,
         p.imageUrl,
-        p.productPrice       AS price,
+        p.productPrice,
         s.discountPercent,
         (p.productPrice - p.productPrice * s.discountPercent / 100.0) AS discountedPrice,
         s.startDate,
@@ -86,4 +120,5 @@ module.exports = {
   updateProduct,
   deleteProduct,
   getFlashSaleProducts,
+  getProductByCategoryId,
 };

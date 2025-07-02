@@ -1,5 +1,5 @@
 // src/components/Navbar.jsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   FiHome,
   FiShoppingBag,
@@ -10,9 +10,13 @@ import {
   FiSearch,
   FiBookOpen,
 } from 'react-icons/fi';
-
+import { getAllCategories } from '../services/CategoryService';
 const Navbar = () => {
+  const [categories, setCategories] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  useEffect(() => {
+    getAllCategories().then((res) => setCategories(res.data.data));
+  }, []);
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
@@ -46,30 +50,15 @@ const Navbar = () => {
             </button>
 
             <div className="absolute top-full left-0 bg-white shadow rounded w-40 z-50 hidden group-hover:block">
-              <a
-                href="/products/figures"
-                className="block px-4 py-2 hover:bg-gray-100"
-              >
-                Mô hình
-              </a>
-              <a
-                href="/products/gundam"
-                className="block px-4 py-2 hover:bg-gray-100"
-              >
-                Gundam
-              </a>
-              <a
-                href="/products/teddy"
-                className="block px-4 py-2 hover:bg-gray-100"
-              >
-                Gấu bông
-              </a>
-              <a
-                href="/products/lego"
-                className="block px-4 py-2 hover:bg-gray-100"
-              >
-                LEGO
-              </a>
+              {categories.map((cate) => (
+                <a
+                  key={cate.categoryId}
+                  href={`/products/category/${cate.categoryId}`}
+                  className="block px-4 py-2 hover:bg-gray-100"
+                >
+                  {cate.categoryName}
+                </a>
+              ))}
             </div>
           </div>
 

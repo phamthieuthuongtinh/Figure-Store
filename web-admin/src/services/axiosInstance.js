@@ -12,5 +12,15 @@ axiosInstance.interceptors.request.use((config) => {
   }
   return config;
 });
-
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      // Nếu lỗi 401 - Unauthorized => token có thể hết hạn
+      localStorage.removeItem('token'); // Xoá token cũ
+      window.location.href = '/login'; // Chuyển về login
+    }
+    return Promise.reject(error);
+  }
+);
 export default axiosInstance;

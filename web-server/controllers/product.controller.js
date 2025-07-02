@@ -39,6 +39,30 @@ const getProductById = async (req, res) => {
     });
   }
 };
+
+const getProductByCategoryId = async (req, res) => {
+  try {
+    const product = await productService.getProductByCategoryId(req.params.id);
+    if (!product) {
+      return res.status(404).json({
+        message: 'Không tìm thấy sản phẩm',
+        code: 0,
+      });
+    }
+    res.json({
+      data: product,
+      message: 'Lấy sản phẩm thành công',
+      code: 1,
+    });
+  } catch (error) {
+    console.error('Lỗi controller:', error);
+    res.status(500).json({
+      message: 'Lỗi máy chủ',
+      code: 0,
+    });
+  }
+};
+
 const createProduct = async (req, res) => {
   try {
     const product = await productService.createProduct(req.body);
@@ -110,4 +134,5 @@ module.exports = {
   updateProduct,
   deleteProduct,
   getFlashSaleProducts,
+  getProductByCategoryId,
 };

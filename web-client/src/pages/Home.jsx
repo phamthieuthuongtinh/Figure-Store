@@ -20,7 +20,6 @@ function Home() {
       </div>
       <NewsAndSocial />
       <WhyChooseMe />
-      <ContactInfo />
     </div>
   );
 }

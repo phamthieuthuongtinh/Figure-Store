@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { AiOutlineHeart } from 'react-icons/ai';
+import { Link } from 'react-router-dom';
 dayjs.extend(duration);
 
 const FlashSaleItem = ({ item }) => {
@@ -49,7 +50,7 @@ const FlashSaleItem = ({ item }) => {
             {item.discountedPrice?.toLocaleString()}₫
           </span>
           <span className="text-gray-500 line-through text-sm">
-            {item.price?.toLocaleString()}₫
+            {item.productPrice?.toLocaleString()}₫
           </span>
         </div>
 
@@ -63,13 +64,15 @@ const FlashSaleItem = ({ item }) => {
       </div>
 
       {/* Đếm ngược */}
-      <div className="mt-1 text-sm text-orange-600 font-semibold">
+      <div className="mt-1 text-sm text-orange-600 font-semibold min-h-[20px]">
         Còn lại: {countdown}
       </div>
 
-      <button className="mt-3 w-full bg-red-500 text-white py-1.5 rounded hover:bg-red-600 transition">
-        Mua ngay
-      </button>
+      <Link to={`/products/detail-product/${item.productId}`}>
+        <button className="w-full bg-red-500 text-white py-1.5 rounded hover:bg-red-600 transition">
+          Mua ngay
+        </button>
+      </Link>
     </div>
   );
 };
