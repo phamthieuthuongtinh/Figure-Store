@@ -1,4 +1,3 @@
-// src/components/Navbar.jsx
 import React, { useEffect, useState } from 'react';
 import {
   FiHome,
@@ -11,9 +10,15 @@ import {
   FiBookOpen,
 } from 'react-icons/fi';
 import { getAllCategories } from '../services/CategoryService';
+import { Link } from 'react-router-dom'; // ✅ Thêm dòng này
+import { useSelector } from 'react-redux';
+
 const Navbar = () => {
   const [categories, setCategories] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const count = useSelector((state) =>
+    state.cart.items.reduce((s, i) => s + i.quantity, 0)
+  );
   useEffect(() => {
     getAllCategories().then((res) => setCategories(res.data.data));
   }, []);
@@ -22,7 +27,9 @@ const Navbar = () => {
     <header className="bg-white shadow-md sticky top-0 z-50">
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
         {/* Logo */}
-        <div className="text-2xl font-bold text-blue-600">ToyVerse</div>
+        <Link to="/" className="text-2xl font-bold text-blue-600">
+          ToyVerse
+        </Link>
 
         {/* Tìm kiếm */}
         <div className="flex-1 mx-6 max-w-md relative">
@@ -36,12 +43,12 @@ const Navbar = () => {
 
         {/* Navigation */}
         <nav className="flex items-center space-x-6">
-          <a
-            href="/"
+          <Link
+            to="/"
             className="flex items-center gap-1 text-gray-700 hover:text-blue-500"
           >
             <FiHome /> Trang chủ
-          </a>
+          </Link>
 
           <div className="relative group">
             <button className="flex items-center gap-1 text-gray-700 hover:text-blue-500">
@@ -51,43 +58,50 @@ const Navbar = () => {
 
             <div className="absolute top-full left-0 bg-white shadow rounded w-40 z-50 hidden group-hover:block">
               {categories.map((cate) => (
-                <a
+                <Link
                   key={cate.categoryId}
-                  href={`/products/category/${cate.categoryId}`}
+                  to={`/products/category/${cate.categoryId}`}
                   className="block px-4 py-2 hover:bg-gray-100"
                 >
                   {cate.categoryName}
-                </a>
+                </Link>
               ))}
             </div>
           </div>
 
-          <a
-            href="/blog"
+          <Link
+            to="/blog"
             className="flex items-center gap-1 text-gray-700 hover:text-blue-500"
           >
             <FiBookOpen /> Blog
-          </a>
+          </Link>
 
-          <a
-            href="/favorites"
+          <Link
+            to="/favorites"
             className="flex items-center gap-1 text-gray-700 hover:text-blue-500"
           >
             <FiHeart /> Yêu thích
-          </a>
+          </Link>
 
-          <a
-            href="/login"
+          <Link
+            to="/login"
             className="flex items-center gap-1 text-gray-700 hover:text-blue-500"
           >
             <FiUser /> Đăng nhập
-          </a>
-          <a
-            href="/cart"
-            className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-700"
+          </Link>
+
+          <Link
+            to="/cart"
+            className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-700 relative"
           >
-            <FiShoppingCart /> Giỏ hàng
-          </a>
+            <FiShoppingCart></FiShoppingCart>{' '}
+            {count > 0 && (
+              <span className="absolute -top-1 -right-2 bg-red-500 text-white rounded-full text-xs px-1">
+                {count}
+              </span>
+            )}
+            Giỏ hàng
+          </Link>
         </nav>
       </div>
     </header>

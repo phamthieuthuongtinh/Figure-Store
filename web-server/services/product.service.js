@@ -11,12 +11,29 @@ const getAllProducts = async () => {
 };
 const getProductById = async (id) => {
   const pool = await poolPromise;
-  const result = await pool
-    .request()
-    .input('productId', id)
-    .query(
-      'SELECT * FROM Products where productId = @productId and isDeleted = 0'
-    );
+  const result = await pool.request().input('productId', id).query(`
+      SELECT  p.*,
+              b.brandName ,
+              s.discountPercent,
+              s.endDate,
+              images = (
+                  SELECT  pi.imageUrl
+                  FROM    ProductImages pi
+                  WHERE   pi.productId = p.productId
+                  FOR JSON PATH
+              ),
+              discountedPrice =
+                    CASE
+                      WHEN s.discountPercent IS NOT NULL
+                      THEN p.productPrice - p.productPrice * s.discountPercent / 100
+                      ELSE NULL
+                    END
+      FROM    Products p
+      LEFT JOIN Brands  b ON p.brandId = b.brandId
+      LEFT JOIN Sales   s ON s.productId = p.productId
+                         AND s.endDate > GETDATE() 
+      WHERE   p.productId = @productId
+  `);
   return result.recordset[0];
 };
 const getProductByCategoryId = async (id) => {

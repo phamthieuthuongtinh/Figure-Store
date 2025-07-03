@@ -4,10 +4,14 @@ import Home from './pages/Home';
 import ProductList from './pages/ProductList';
 import ProductsByCategory from './pages/ProductsByCategory';
 import ProductDetail from './pages/ProductDetail';
-
+import ScrollToTop from './components/ScrollToTop';
+import CartPage from './pages/CartPage';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Home />} />
@@ -20,8 +24,10 @@ function App() {
             path="/products/detail-product/:productId"
             element={<ProductDetail />}
           />
+          <Route path="/cart" element={<CartPage />} />
         </Route>
       </Routes>
+      <ToastContainer />
     </Router>
   );
 }

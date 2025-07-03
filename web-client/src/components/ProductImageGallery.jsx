@@ -18,17 +18,17 @@ export default function ProductImageGallery({ images }) {
         navigation
         zoom
         effect="fade"
+        fadeEffect={{ crossFade: true }}
         thumbs={{
           swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null,
         }}
         modules={[Navigation, Thumbs, Zoom, EffectFade]}
-        className="mb-4"
+        className="mb-4 h-[440px]"
         spaceBetween={10}
       >
         {images.map((img, i) => (
           <SwiperSlide key={i}>
-            {/* bắt buộc bọc trong swiper-zoom-container để Zoom hoạt động */}
-            <div className="swiper-zoom-container">
+            <div className="swiper-zoom-container relative">
               <img
                 src={img}
                 alt={`img-${i}`}
@@ -49,12 +49,18 @@ export default function ProductImageGallery({ images }) {
       >
         {images.map((img, i) => (
           <SwiperSlide key={i}>
-            <div className="swiper-zoom-container">
+            {/* class này sẽ được Swiper tự động thêm khi thumbnail được active */}
+            <div
+              className="
+          swiper-zoom-container
+          swiper-thumb-img-wrapper
+        "
+            >
               <img
                 src={img}
                 alt={`thumb-${i}`}
                 className="w-full h-20 object-cover rounded cursor-pointer
-                         border-2 border-transparent hover:border-red-400"
+                   border-2 border-transparent"
               />
             </div>
           </SwiperSlide>
