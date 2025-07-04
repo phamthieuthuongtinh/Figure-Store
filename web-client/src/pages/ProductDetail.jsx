@@ -6,8 +6,9 @@ import ProductImageGallery from '../components/ProductImageGallery';
 import { getProductById } from '../services/ProductService';
 import ProductCommitments from '../components/ProductCommitments';
 
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { addItem } from '../slices/cartSlice';
+import { addCartItem } from '../services/CartService';
 import { toast } from 'react-toastify';
 
 dayjs.extend(duration);
@@ -84,11 +85,43 @@ export default function ProductDetail() {
 
   //Add giỏ hàng
   const dispatch = useDispatch();
-  const handleAddToCart = () => {
+  const user = useSelector((state) => state.auth.user);
+  const handleAddToCart = async () => {
     const qty = parseInt(document.getElementById('qty').value, 10) || 1;
-    dispatch(addItem({ product, quantity: qty }));
-    toast.success('✅ Đã thêm vào giỏ hàng!');
+
+    if (user) {
+      try {
+        const res = await addCartItem({
+          productId: product.productId,
+          quantity: qty,
+        });
+
+        // serverItem phải lấy đúng key (code/message/data)
+        const serverItem = res.data.data;
+        // console.log(serverItem);
+        dispatch(
+          addItem({
+            productId: product.productId,
+            productName: product.productName,
+            imageUrl: product.imageUrl,
+            priceAtTime: product.priceAtTime || serverItem.priceAtTime,
+            cartItemId: serverItem.cartItemId,
+            quantity: qty,
+          })
+        );
+
+        toast.success('Đã thêm vào giỏ hàng!');
+      } catch (err) {
+        console.error(err.response?.data || err.message);
+        toast.error('Không lưu được giỏ hàng!');
+      }
+    } else {
+      // Chưa đăng nhập → chỉ local
+      dispatch(addItem({ ...product, quantity: qty }));
+      toast.success('Đã thêm vào giỏ hàng!');
+    }
   };
+
   if (loading)
     return (
       <div className="flex items-center justify-center h-72">

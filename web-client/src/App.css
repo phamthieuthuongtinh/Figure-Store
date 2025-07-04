@@ -40,3 +40,48 @@
   border: 2px solid #ef4444 !important;
   border-radius: 8px;
 }
+
+/* Mây bay */
+.cloud {
+  position: absolute;
+  background: url('/images/cloud.png') no-repeat;
+  background-size: contain;
+  width: 200px;
+  height: 100px;
+  opacity: 0.8;
+  animation: moveCloud 60s linear infinite;
+  z-index: 0;
+}
+.cloud-1 {
+  top: 50px;
+  left: -200px;
+  animation-delay: 0s;
+}
+.cloud-2 {
+  top: 120px;
+  left: -300px;
+  animation-delay: 10s;
+}
+.cloud-3 {
+  top: 200px;
+  left: -250px;
+  animation-delay: 20s;
+}
+
+@keyframes moveCloud {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(120vw);
+  }
+}
+
+@keyframes flyBird {
+  0% {
+    transform: translateX(0) translateY(0);
+  }
+  100% {
+    transform: translateX(120vw) translateY(-40px);
+  }
+}

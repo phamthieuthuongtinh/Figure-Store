@@ -8,6 +8,9 @@ import ScrollToTop from './components/ScrollToTop';
 import CartPage from './pages/CartPage';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import RegisterPage from './pages/RegisterPage';
+import LoginPage from './pages/LoginPage';
+import BlogPage from './pages/BlogPage';
 function App() {
   return (
     <Router>
@@ -20,11 +23,14 @@ function App() {
             path="/products/category/:categoryId"
             element={<ProductsByCategory />}
           />
+          <Route path="/blogs" element={<BlogPage />} />
           <Route
             path="/products/detail-product/:productId"
             element={<ProductDetail />}
           />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/login" element={<LoginPage />} />
         </Route>
       </Routes>
       <ToastContainer />

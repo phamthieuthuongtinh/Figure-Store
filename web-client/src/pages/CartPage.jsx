@@ -1,10 +1,24 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { removeItem, updateQty, clearCart } from '../slices/cartSlice';
-import { useState } from 'react';
-
+import {
+  removeItem,
+  updateQty,
+  clearCart,
+  setCartItems,
+} from '../slices/cartSlice';
+import {
+  deleteCartItem,
+  fetchMyCart,
+  getMyCart,
+  updateCartItem,
+} from '../services/CartService';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 export default function CartPage() {
   const items = useSelector((state) => state.cart.items);
   const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
   const [orders, setOrders] = useState([
     {
       id: 1001,
@@ -36,13 +50,68 @@ export default function CartPage() {
       ],
     },
   ]);
+  /* ----------------- Lấy giỏ hàng khi đã login ----------------- */
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      try {
+        const res = await fetchMyCart();
+        dispatch(setCartItems(res.data.data)); // <- đảm bảo đúng key: .data.data hoặc .data.items tuỳ backend
+      } catch (err) {
+        console.log('Lỗi khi lấy giỏ hàng:', err);
+        toast.error('Không lấy được giỏ hàng');
+      }
+    })();
+  }, [user, dispatch]);
+  /* ---------- Hàm helper gọi API + dispatch Redux ---------- */
+  const handleUpdateQty = async (cartItem, newQty) => {
+    if (user) {
+      try {
+        await updateCartItem(cartItem.cartItemId, { quantity: newQty });
+      } catch {
+        toast.error('Lỗi cập nhật số lượng');
+        return;
+      }
+    }
+    dispatch(updateQty({ productId: cartItem.productId, quantity: newQty }));
+  };
+  const handleRemoveItem = async (cartItem) => {
+    if (user) {
+      try {
+        await deleteCartItem(cartItem.cartItemId);
+      } catch {
+        toast.error('Lỗi xoá sản phẩm');
+        return;
+      }
+    }
+    dispatch(removeItem(cartItem.productId));
+  };
 
+  const handleClear = async () => {
+    if (user) {
+      try {
+        // gọi API xoá toàn bộ (nếu bạn đã làm); nếu chưa, loop deleteCartItem
+        await Promise.all(items.map((it) => deleteCartItem(it.cartItemId)));
+      } catch {
+        toast.error('Lỗi xoá giỏ hàng');
+        return;
+      }
+    }
+    dispatch(clearCart());
+  };
+  /* -------------------- Tính tổng tiền -------------------- */
   const total = items.reduce(
-    (sum, item) =>
-      sum + item.quantity * (item.discountedPrice ?? item.productPrice),
+    (sum, it) => sum + it.quantity * it.priceAtTime,
     0
   );
+
+  /* ------------------ Thanh toán giả ------------------ */
   const fakeCheckout = () => {
+    if (!user) {
+      toast.info('Vui lòng đăng nhập để thanh toán!');
+      navigate('/login');
+      return;
+    }
     const fakeOrder = {
       id: Date.now(),
       items,
@@ -62,24 +131,21 @@ export default function CartPage() {
       ) : (
         <>
           <ul className="divide-y">
-            {items.map((item) => (
+            {items.map((it) => (
               <li
-                key={item.productId}
+                key={it.productId}
                 className="py-4 flex items-center justify-between"
               >
                 <div className="flex items-center gap-4">
                   <img
-                    src={item.imageUrl}
-                    alt={item.productName}
+                    src={it.imageUrl}
+                    alt={it.productName}
                     className="w-20 h-20 object-cover rounded"
                   />
                   <div>
-                    <h3 className="font-medium">{item.productName}</h3>
+                    <h3 className="font-medium">{it.productName}</h3>
                     <p className="text-sm text-gray-500">
-                      {(
-                        item.discountedPrice ?? item.productPrice
-                      ).toLocaleString()}
-                      ₫
+                      {it.priceAtTime.toLocaleString()}₫
                     </p>
                   </div>
                 </div>
@@ -88,19 +154,14 @@ export default function CartPage() {
                   <input
                     type="number"
                     min="1"
-                    value={item.quantity}
+                    value={it.quantity}
                     onChange={(e) =>
-                      dispatch(
-                        updateQty({
-                          productId: item.productId,
-                          quantity: parseInt(e.target.value, 10) || 1,
-                        })
-                      )
+                      handleUpdateQty(it, parseInt(e.target.value, 10) || 1)
                     }
                     className="w-16 border p-1 text-center rounded"
                   />
                   <button
-                    onClick={() => dispatch(removeItem(item.productId))}
+                    onClick={() => handleRemoveItem(it)}
                     className="text-red-500 hover:underline"
                   >
                     Xóa
@@ -112,7 +173,7 @@ export default function CartPage() {
 
           <div className="mt-6 flex justify-between items-center">
             <button
-              onClick={() => dispatch(clearCart())}
+              onClick={handleClear}
               className="text-gray-500 hover:underline"
             >
               Xóa tất cả
@@ -125,7 +186,6 @@ export default function CartPage() {
             </div>
           </div>
 
-          {/* Nút Thanh toán (fake) */}
           <div className="mt-6 text-right">
             <button
               onClick={fakeCheckout}
@@ -136,7 +196,6 @@ export default function CartPage() {
           </div>
         </>
       )}
-
       {/* Đơn hàng đã đặt (giả lập) */}
       {orders.length > 0 && (
         <div className="mt-10">

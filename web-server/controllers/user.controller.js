@@ -89,6 +89,19 @@ const deleteUser = async (req, res) => {
     });
   }
 };
+
+// đăng ký/ đăng nhập
+const registerUser = async (req, res) => {
+  try {
+    const result = await userService.registerUser(req.body);
+    res.status(201).json(result);
+  } catch (err) {
+    return res
+      .status(err.status || 500)
+      .json({ message: err.message || 'Đã có lỗi xảy ra' });
+  }
+};
+
 const loginUser = async (req, res) => {
   try {
     const result = await userService.loginUser(req.body);
@@ -106,4 +119,5 @@ module.exports = {
   updateUser,
   deleteUser,
   loginUser,
+  registerUser,
 };
