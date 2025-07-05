@@ -116,8 +116,16 @@ export default function ProductDetail() {
         toast.error('Không lưu được giỏ hàng!');
       }
     } else {
-      // Chưa đăng nhập → chỉ local
-      dispatch(addItem({ ...product, quantity: qty }));
+      dispatch(
+        addItem({
+          ...product,
+          quantity: qty,
+          priceAtTime:
+            typeof product.discountedPrice === 'number'
+              ? product.discountedPrice
+              : product.productPrice ?? 0,
+        })
+      );
       toast.success('Đã thêm vào giỏ hàng!');
     }
   };

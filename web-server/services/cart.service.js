@@ -137,4 +137,49 @@ const deleteItem = async (userId, id) => {
     .query('DELETE FROM CartItems WHERE cartItemId=@id AND cartId=@cartId');
 };
 
-module.exports = { getCartItems, addItem, updateItemQty, deleteItem };
+const syncCart = async (userId, items) => {
+  if (items.length === 0) {
+    const err = new Error('Không có sản phẩm để đồng bộ');
+    err.statusCode = 400;
+    throw err;
+  }
+  const pool = await poolPromise;
+  const cartId = await getCartIdByUser(userId);
+  for (const item of items) {
+    const { productId, quantity, priceAtTime } = item;
+    // 1. Kiểm tra item đã tồn tại
+    const found = await pool
+      .request()
+      .input('productId', productId)
+      .input('cartId', cartId)
+      .query(
+        `SELECT quantity FROM CartItems WHERE cartId = @cartId AND productId = @productId`
+      );
+
+    if (found.recordset.length) {
+      // 2. Cập nhật quantity
+      await pool
+        .request()
+        .input('productId', productId)
+        .input('cartId', cartId)
+        .input('qty', quantity)
+        .query(
+          `UPDATE CartItems SET quantity = quantity + @qty WHERE cartId = @cartId AND productId = @productId`
+        );
+    } else {
+      // 3. Thêm mới
+      await pool
+        .request()
+        .input('productId', productId)
+        .input('cartId', cartId)
+        .input('quantity', quantity)
+        .input('priceAtTime', priceAtTime)
+        .query(
+          ` INSERT INTO CartItems(cartId, productId, quantity, priceAtTime)
+          OUTPUT INSERTED.cartItemId
+          VALUES (@cartId, @productId, @quantity, @priceAtTime)`
+        );
+    }
+  }
+};
+module.exports = { getCartItems, addItem, updateItemQty, deleteItem, syncCart };

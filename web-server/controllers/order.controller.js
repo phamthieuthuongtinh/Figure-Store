@@ -89,10 +89,25 @@ const deleteOrder = async (req, res) => {
     });
   }
 };
+
+const getMyOrders = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const orders = await orderService.getMyOrders(userId);
+
+    return res.json({ code: 1, data: orders });
+  } catch (err) {
+    console.error('Lỗi getMyOrders:', err);
+    return res
+      .status(err.statusCode || 500)
+      .json({ code: 0, message: err.message || 'Internal Server Error' });
+  }
+};
 module.exports = {
   getAllOrders,
   getOrderById,
   createOrder,
   updateOrder,
   deleteOrder,
+  getMyOrders,
 };

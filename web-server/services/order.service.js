@@ -44,10 +44,37 @@ const deleteOrder = async (id) => {
     .input('orderId', id)
     .query('UPDATE Orders SET isDeleted = 1 WHERE orderId = @orderId');
 };
+
+const getMyOrders = async (userId) => {
+  const pool = await poolPromise;
+
+  const ordersRes = await pool
+    .request()
+    .input('userId', userId)
+    .query(`SELECT * FROM Orders WHERE userId = @userId`);
+
+  const orders = [];
+
+  for (const order of ordersRes.recordset) {
+    const itemsRes = await pool.request().input('orderId', order.orderId)
+      .query(`SELECT od.*, p.productName 
+              FROM OrderDetails od 
+              JOIN Products p ON p.productId = od.productId 
+              WHERE od.orderId = @orderId`);
+
+    orders.push({
+      ...order,
+      items: itemsRes.recordset,
+    });
+  }
+
+  return orders;
+};
 module.exports = {
   getAllOrders,
   getOrderById,
   createOrder,
   updateOrder,
   deleteOrder,
+  getMyOrders,
 };

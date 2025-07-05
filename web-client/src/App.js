@@ -33,7 +33,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
         </Route>
       </Routes>
-      <ToastContainer />
+      <ToastContainer position="bottom-right" />
     </Router>
   );
 }

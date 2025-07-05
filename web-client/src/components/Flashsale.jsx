@@ -12,7 +12,7 @@ function FlashSale() {
   }, [dispatch]);
 
   return (
-    <div className="bg-red-50 py-12">
+    <div className="bg-red-50 py-12 mt-5">
       <div className="max-w-7xl mx-auto px-4">
         <h2 className="text-2xl font-bold text-red-600 mb-6 text-center">
           ⚡ Khuyến mãi sốc - Flash Sale!

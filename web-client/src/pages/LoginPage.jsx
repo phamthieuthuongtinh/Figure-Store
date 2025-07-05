@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { setAuth } from '../slices/authSlice';
 import { toast } from 'react-toastify';
 import { login } from '../services/UserService';
+import { syncCart } from '../services/CartService';
 import { Link, useNavigate } from 'react-router-dom';
 
 function LoginPage() {
@@ -17,9 +18,22 @@ function LoginPage() {
     e.preventDefault();
     try {
       const res = await login(form);
+      const localCart = JSON.parse(localStorage.getItem('cart'));
+      // console.log(localCart);
       const { user, accessToken } = res.data.data;
       dispatch(setAuth({ user, accessToken }));
+      if (Array.isArray(localCart) && localCart.length > 0) {
+        try {
+          await syncCart({ localCart });
+
+          localStorage.removeItem('cart');
+        } catch (syncErr) {
+          console.error('Sync cart failed:', syncErr);
+          toast.warning('Đăng nhập thành công, nhưng lỗi đồng bộ giỏ hàng');
+        }
+      }
       toast.success('Đăng nhập thành công!');
+
       navigate('/', { replace: true }); // về trang chủ
     } catch (err) {
       toast.error(err.response?.data?.message || 'Lỗi đăng nhập');

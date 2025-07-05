@@ -48,10 +48,25 @@ const deleteItem = async (req, res) => {
       .json({ code: 0, message: err.message || 'Lỗi server' });
   }
 };
+const syncCart = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const items = req.body.localCart;
+    console.log('controller', items);
+    await cartService.syncCart(userId, items);
 
+    return res.json({ code: 1, message: 'Đồng bộ giỏ hàng thành công' });
+  } catch (err) {
+    console.error('Cart sync error:', err);
+    return res
+      .status(err.statusCode || 500)
+      .json({ code: 0, message: err.message || 'Internal Server Error' });
+  }
+};
 module.exports = {
   getMyCart,
   addItem,
   updateItemQty,
   deleteItem,
+  syncCart,
 };
