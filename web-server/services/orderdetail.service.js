@@ -1,4 +1,5 @@
 const { poolPromise } = require('../config/db');
+
 const sql = require('mssql');
 const getAllOrderDetails = async () => {
   const pool = await poolPromise;
@@ -20,7 +21,6 @@ const getOrderDetailById = async (id) => {
 const createOrderDetail = async ({ orderId, items }) => {
   const pool = await poolPromise;
   const transaction = new sql.Transaction(pool);
-
   try {
     await transaction.begin();
 

@@ -182,4 +182,20 @@ const syncCart = async (userId, items) => {
     }
   }
 };
-module.exports = { getCartItems, addItem, updateItemQty, deleteItem, syncCart };
+const clearCart = async (userId) => {
+  const cartId = await getCartIdByUser(userId);
+  const pool = await poolPromise;
+
+  await pool
+    .request()
+    .input('cartId', cartId)
+    .query('DELETE FROM CartItems WHERE cartId = @cartId');
+};
+module.exports = {
+  getCartItems,
+  addItem,
+  updateItemQty,
+  deleteItem,
+  syncCart,
+  clearCart,
+};

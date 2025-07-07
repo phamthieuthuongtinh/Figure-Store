@@ -14,13 +14,26 @@ import {
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { fetchMyOrders } from '../services/OrderService';
+import {
+  cancelOrder,
+  checkoutOrder,
+  checkoutVnpay,
+  fetchMyOrders,
+} from '../services/OrderService';
 export default function CartPage() {
   const items = useSelector((state) => state.cart.items);
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('COD');
+
+  const handleCheckout = () => setOpenConfirm(true);
+  const handleConfirm = () => {
+    setOpenConfirm(false);
+    checkout();
+  };
   useEffect(() => {
     const loadOrders = async () => {
       try {
@@ -35,17 +48,17 @@ export default function CartPage() {
     loadOrders();
   }, []);
   const handleCancelOrder = async (orderId) => {
-    // if (!window.confirm('Bạn có chắc muốn hủy đơn hàng này không?')) return;
-    // try {
-    //   await axiosInstance.patch(`/orders/${orderId}`, { status: 'CANCELLED' });
-    //   toast.success('Hủy đơn hàng thành công');
-    //   // reload lại danh sách đơn
-    //   const res = await fetchMyOrders();
-    //   setOrders(res.data.data);
-    // } catch (err) {
-    //   console.error(err);
-    //   toast.error('Không thể hủy đơn hàng');
-    // }
+    if (!window.confirm('Bạn có chắc muốn hủy đơn hàng này không?')) return;
+    try {
+      await cancelOrder(orderId);
+      toast.success('Hủy đơn hàng thành công');
+      // reload lại danh sách đơn
+      const res = await fetchMyOrders();
+      setOrders(res.data.data);
+    } catch (err) {
+      console.error(err);
+      toast.error('Không thể hủy đơn hàng');
+    }
   };
 
   /* ----------------- Lấy giỏ hàng khi đã login ----------------- */
@@ -88,7 +101,6 @@ export default function CartPage() {
   const handleClear = async () => {
     if (user) {
       try {
-        // gọi API xoá toàn bộ (nếu bạn đã làm); nếu chưa, loop deleteCartItem
         await Promise.all(items.map((it) => deleteCartItem(it.cartItemId)));
       } catch {
         toast.error('Lỗi xoá giỏ hàng');
@@ -104,21 +116,48 @@ export default function CartPage() {
   );
 
   /* ------------------ Thanh toán giả ------------------ */
-  const fakeCheckout = () => {
+  const checkout = async () => {
     if (!user) {
       toast.info('Vui lòng đăng nhập để thanh toán!');
       navigate('/login');
       return;
     }
-    const fakeOrder = {
-      id: Date.now(),
-      items,
-      total,
-      status: 'Chờ xác nhận',
+    const payload = {
+      items: items.map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        priceAtTime: item.priceAtTime,
+      })),
+      // couponId: selectedCouponId || null,
+      // discountAmount: discount || 0,
+      totalPrice: total, // tổng giá từ client
+      paymentMethod,
     };
-    setOrders((prev) => [...prev, fakeOrder]);
-    dispatch(clearCart());
+    try {
+      if (paymentMethod === 'COD') {
+        await checkoutOrder(payload);
+
+        toast.success('Đặt hàng thành công!');
+        handleClear();
+        navigate('/cart');
+      } else if (paymentMethod === 'VNPAY') {
+        const { data } = await checkoutVnpay({ payload }); // POST /payment/vnpay
+        window.location.href = data.url;
+      } else if (paymentMethod === 'MOMO') {
+        // Chưa làm, sau sẽ xử lý ở đây
+        toast.info('Chức năng MOMO đang phát triển...');
+      }
+    } catch (error) {
+      const msg = error.response?.data?.message || 'Thanh toán thất bại!';
+      toast.error(msg);
+    }
   };
+  useEffect(() => {
+    const onKeyDown = (e) => e.key === 'Escape' && setOpenConfirm(false);
+    if (openConfirm) window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [openConfirm]);
+
   return (
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">🛒 Giỏ hàng của bạn</h1>
@@ -190,10 +229,32 @@ export default function CartPage() {
             </div>
           </div>
 
-          <div className="mt-6 text-right">
+          <div className="mt-6 text-right space-y-3">
+            {/* Label + Select */}
+            <div className="flex items-center justify-end space-x-3">
+              <label className="font-medium text-gray-700">
+                Phương thức thanh toán:
+              </label>
+              <select
+                value={paymentMethod}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+                className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
+              >
+                <option value="">-- Chọn phương thức --</option>
+                <option value="COD">Thanh toán khi nhận hàng (COD)</option>
+                <option value="VNPAY">VNPAY</option>
+                <option value="MOMO">MOMO</option>
+              </select>
+            </div>
+
+            {/* Nút Thanh toán */}
             <button
-              onClick={fakeCheckout}
-              className="bg-orange-500 text-white font-semibold px-6 py-2 rounded-lg hover:bg-orange-600 transition-all duration-300 shadow-md"
+              onClick={handleCheckout}
+              disabled={!paymentMethod} // disable nếu chưa chọn
+              className={`bg-orange-500 text-white font-semibold px-6 py-2 rounded-lg
+                transition-all duration-300 shadow-md
+                hover:bg-orange-600
+                ${!paymentMethod ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               Thanh toán
             </button>
@@ -277,6 +338,32 @@ export default function CartPage() {
           ))
         )}
       </div>
+
+      {/* modal */}
+      {openConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white w-full max-w-sm rounded-xl shadow-xl p-6 animate-fadeIn">
+            <h3 className="text-lg font-semibold mb-4">Xác nhận thanh toán</h3>
+            <p className="mb-6">Bạn có chắc chắn muốn đặt đơn hàng này?</p>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setOpenConfirm(false)}
+                className="px-4 py-2 rounded-lg border hover:bg-gray-100"
+              >
+                Huỷ
+              </button>
+              <button
+                onClick={handleConfirm}
+                className="px-4 py-2 rounded-lg bg-orange-500 text-white
+                           hover:bg-orange-600"
+              >
+                Đồng ý
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

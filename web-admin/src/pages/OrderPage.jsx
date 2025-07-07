@@ -55,7 +55,7 @@ const OrderPage = () => {
       render: (discount) => `${discount.toLocaleString()}₫`,
     },
     {
-      title: 'Trạng thái',
+      title: 'Trạng thái đơn',
       dataIndex: 'status',
       key: 'status',
       render: (status) => {
@@ -68,6 +68,28 @@ const OrderPage = () => {
           }[status] || 'default';
         const label =
           typeof status === 'string' ? status.toUpperCase() : 'KHÔNG RÕ';
+        return <Tag color={color}>{label}</Tag>;
+      },
+    },
+    {
+      title: 'Phương thức',
+      dataIndex: 'paymentMethod',
+      key: 'paymentMethod',
+    },
+    {
+      title: 'Trạng thái thanh toán',
+      dataIndex: 'paymentStatus',
+      key: 'paymentStatus',
+      render: (paymentStatus) => {
+        const color =
+          {
+            unpaid: 'gold',
+            paid: 'green',
+          }[paymentStatus] || 'default';
+        const label =
+          typeof paymentStatus === 'string'
+            ? paymentStatus.toUpperCase()
+            : 'KHÔNG RÕ';
         return <Tag color={color}>{label}</Tag>;
       },
     },
@@ -89,9 +111,11 @@ const OrderPage = () => {
             okText="Xoá"
             cancelText="Hủy"
           >
-            <Button danger icon={<DeleteOutlined />}>
-              Xoá
-            </Button>
+            {record.status === 'pending' && (
+              <Button danger icon={<DeleteOutlined />}>
+                Xoá
+              </Button>
+            )}
           </Popconfirm>
         </Space>
       ),

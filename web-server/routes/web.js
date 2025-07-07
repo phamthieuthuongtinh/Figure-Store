@@ -13,4 +13,5 @@ router.use('/api/users', require('./user.routes'));
 router.use('/api/sales', require('./sale.routes'));
 router.use('/api/banners', require('./banner.routes'));
 router.use('/api/carts', require('./cart.routes'));
+router.use('/api/payment', require('./payment.routes'));
 module.exports = router;
