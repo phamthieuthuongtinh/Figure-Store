@@ -1,5 +1,6 @@
 const orderDetailService = require('../services/orderdetail.service');
 const { createOrder } = require('../services/order.service');
+const { clearCart } = require('../services/cart.service');
 const getAllOrderDetails = async (req, res) => {
   try {
     const orderDetails = await orderDetailService.getAllOrderDetails();
