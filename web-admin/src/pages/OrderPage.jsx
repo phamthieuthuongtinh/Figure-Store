@@ -111,7 +111,7 @@ const OrderPage = () => {
             okText="Xoá"
             cancelText="Hủy"
           >
-            {record.status === 'pending' && (
+            {record.status === 'pending' && record.paymentStatus !== 'paid' && (
               <Button danger icon={<DeleteOutlined />}>
                 Xoá
               </Button>

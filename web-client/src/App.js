@@ -11,6 +11,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 import BlogPage from './pages/BlogPage';
+import PaymentSuccess from './components/PaymentSuccess';
 function App() {
   return (
     <Router>
@@ -31,6 +32,7 @@ function App() {
           <Route path="/cart" element={<CartPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
         </Route>
       </Routes>
       <ToastContainer position="bottom-right" />

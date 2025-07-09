@@ -24,7 +24,7 @@ const createOrder = async (data) => {
     .input('couponId', data.couponId || null)
     .input('discountAmount', data.discountAmount || 0)
     .input('paymentMethod', data.paymentMethod || 'COD')
-    .input('paymentStatus', 'unpaid')
+    .input('paymentStatus', data.paymentMethod === 'COD' ? 'unpaid' : 'paid')
     .query(`INSERT INTO Orders (userId, totalPrice, couponId, discountAmount, paymentMethod, paymentStatus)
             OUTPUT INSERTED.* VALUES (@userId, @totalPrice,@couponId, @discountAmount, @paymentMethod, @paymentStatus)`);
   return result.recordset[0];

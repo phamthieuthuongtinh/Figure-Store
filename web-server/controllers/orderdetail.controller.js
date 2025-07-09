@@ -1,6 +1,6 @@
 const orderDetailService = require('../services/orderdetail.service');
 const { createOrder } = require('../services/order.service');
-const { clearCart } = require('../services/cart.service');
+const { clearCart, getCartItems } = require('../services/cart.service');
 const getAllOrderDetails = async (req, res) => {
   try {
     const orderDetails = await orderDetailService.getAllOrderDetails();
@@ -45,17 +45,29 @@ const getOrderDetailById = async (req, res) => {
 
 const createOrderDetail = async (req, res) => {
   try {
-    const userId = req.user.userId;
-
     const {
-      items,
+      items: rawItems,
       couponId,
       discountAmount = 0,
       totalPrice,
       paymentMethod = 'COD',
+      userId,
     } = req.body;
-    if (!items?.length) {
-      return res.status(400).json({ message: 'Giỏ hàng trống' });
+    let items = rawItems;
+    if (paymentMethod !== 'COD') {
+      //  Lấy giỏ hàng từ bảng cart nếu không phải COD
+      items = await getCartItems(userId); // Viết hàm này lấy từ bảng CartItems
+
+      if (!items || !items.length) {
+        return res
+          .status(400)
+          .json({ message: 'Giỏ hàng trong hệ thống trống' });
+      }
+    } else {
+      //  Nếu là COD thì phải có items gửi từ client
+      if (!items || !items.length) {
+        return res.status(400).json({ message: 'Giỏ hàng trống' });
+      }
     }
 
     const serverTotal =
@@ -77,12 +89,17 @@ const createOrderDetail = async (req, res) => {
       orderId: order.orderId,
       items,
     });
+    await clearCart(userId);
+    if (paymentMethod !== 'COD') {
+      return res.redirect(
+        `http://localhost:3001/payment-success?message=Thanh toán thành công&orderId=${order.orderId}`
+      );
+    }
     res.status(200).json({
       data: orderDetail,
       message: 'Tạo chi tiết đơn hàng thành công!',
       code: 1,
     });
-    await clearCart(userId);
   } catch (error) {
     console.error('Lỗi controller', error);
     res.status(500).json({

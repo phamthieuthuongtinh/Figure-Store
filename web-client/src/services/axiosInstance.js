@@ -17,10 +17,11 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      toast.error('Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại!');
+      toast.error('Vui lòng đăng nhập lại để thanh toán!');
       localStorage.removeItem('accessToken');
       localStorage.removeItem('user');
-      window.location.href = '/login'; // điều hướng về trang login
+      // localStorage.removeItem('cart');
+      // window.location.href = '/login'; // điều hướng về trang login
     }
     return Promise.reject(error);
   }

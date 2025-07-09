@@ -52,7 +52,7 @@ const syncCart = async (req, res) => {
   try {
     const userId = req.user.userId;
     const items = req.body.localCart;
-    console.log('controller', items);
+    // console.log('controller', items);
     await cartService.syncCart(userId, items);
 
     return res.json({ code: 1, message: 'Đồng bộ giỏ hàng thành công' });

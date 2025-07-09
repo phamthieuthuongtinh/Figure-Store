@@ -132,6 +132,7 @@ export default function CartPage() {
       // discountAmount: discount || 0,
       totalPrice: total, // tổng giá từ client
       paymentMethod,
+      userId: user.userId,
     };
     try {
       if (paymentMethod === 'COD') {
@@ -143,6 +144,9 @@ export default function CartPage() {
       } else if (paymentMethod === 'VNPAY') {
         const { data } = await checkoutVnpay({ payload }); // POST /payment/vnpay
         window.location.href = data.url;
+        // toast.success('Đặt hàng thành công!');
+        // handleClear();
+        navigate('/cart');
       } else if (paymentMethod === 'MOMO') {
         // Chưa làm, sau sẽ xử lý ở đây
         toast.info('Chức năng MOMO đang phát triển...');
